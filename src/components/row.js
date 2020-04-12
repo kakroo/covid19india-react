@@ -1,6 +1,10 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import * as Icon from 'react-feather';
-import {formatDate, formatDateAbsolute} from '../utils/common-functions';
+import {
+  formatDate,
+  formatDateAbsolute,
+  formatNumber,
+} from '../utils/common-functions';
 import {formatDistance} from 'date-fns';
 import {Link} from 'react-router-dom';
 
@@ -83,39 +87,45 @@ function Row(props) {
 
   return (
     <React.Fragment>
-      <span
-        className={`dropdown ${
-          props.reveal ? 'rotateRightDown' : 'rotateDownRight'
-        }`}
-        style={{display: !props.total ? '' : 'none'}}
-        onClick={() => {
-          handleReveal();
-        }}
-      >
-        <Icon.ChevronDown />
-      </span>
       <tr
         className={props.total ? 'state is-total' : 'state'}
         onMouseEnter={() => props.onHighlightState?.(state, props.index)}
         onMouseLeave={() => props.onHighlightState?.()}
-        touchstart={() => props.onHighlightState?.(state, props.index)}
+        onTouchStart={() => props.onHighlightState?.(state, props.index)}
         onClick={!props.total ? handleReveal : null}
         style={{background: props.index % 2 === 0 ? '#f8f9fa' : ''}}
       >
         <td style={{fontWeight: 600}}>
-          {state.state}
-          {state.state === 'West Bengal' && (
-            <Link to="/faq">
-              <Icon.AlertCircle />
-            </Link>
-          )}
+          <div className="table__title-wrapper">
+            <span
+              className={`dropdown ${
+                props.reveal ? 'rotateRightDown' : 'rotateDownRight'
+              }`}
+              style={{display: !props.total ? '' : 'none'}}
+              onClick={() => {
+                handleReveal();
+              }}
+            >
+              <Icon.ChevronDown />
+            </span>
+            {state.state}
+            {state.state === 'West Bengal' && (
+              <Link to="/faq">
+                <Icon.HelpCircle className="height-22" />
+              </Link>
+            )}
+          </div>
         </td>
         <td>
           <span className="deltas" style={{color: '#ff073a'}}>
             {state.deltaconfirmed > 0 && <Icon.ArrowUp />}
             {state.deltaconfirmed > 0 ? `${state.deltaconfirmed}` : ''}
           </span>
-          {parseInt(state.confirmed) === 0 ? '-' : state.confirmed}
+          <span className="table__count-text">
+            {parseInt(state.confirmed) === 0
+              ? '-'
+              : formatNumber(state.confirmed)}
+          </span>
         </td>
         <td
           style={{color: parseInt(state.active) === 0 ? '#B5B5B5' : 'inherit'}}
@@ -124,7 +134,7 @@ function Row(props) {
             {!state.delta.active==0 && <Icon.ArrowUp/>}
             {state.delta.active>0 ? `${state.delta.active}` : ''}
           </span>*/}
-          {parseInt(state.active) === 0 ? '-' : state.active}
+          {parseInt(state.active) === 0 ? '-' : formatNumber(state.active)}
         </td>
         <td
           style={{
@@ -135,7 +145,11 @@ function Row(props) {
             {state.deltarecovered > 0 && <Icon.ArrowUp />}
             {state.deltarecovered > 0 ? `${state.deltarecovered}` : ''}
           </span>
-          {parseInt(state.recovered) === 0 ? '-' : state.recovered}
+          <span className="table__count-text">
+            {parseInt(state.recovered) === 0
+              ? '-'
+              : formatNumber(state.recovered)}
+          </span>
         </td>
         <td
           style={{color: parseInt(state.deaths) === 0 ? '#B5B5B5' : 'inherit'}}
@@ -144,7 +158,9 @@ function Row(props) {
             {state.deltadeaths > 0 && <Icon.ArrowUp />}
             {state.deltadeaths > 0 ? `${state.deltadeaths}` : ''}
           </span>
-          {parseInt(state.deaths) === 0 ? '-' : state.deaths}
+          <span className="table__count-text">
+            {parseInt(state.deaths) === 0 ? '-' : formatNumber(state.deaths)}
+          </span>
         </td>
       </tr>
 
@@ -239,7 +255,7 @@ function Row(props) {
                     props.onHighlightDistrict?.(district, state, props.index)
                   }
                   onMouseLeave={() => props.onHighlightDistrict?.()}
-                  touchstart={() =>
+                  onTouchStart={() =>
                     props.onHighlightDistrict?.(district, state, props.index)
                   }
                 >
@@ -253,7 +269,9 @@ function Row(props) {
                         ? `${sortedDistricts[district].delta.confirmed}`
                         : ''}
                     </span>
-                    {sortedDistricts[district].confirmed}
+                    <span className="table__count-text">
+                      {formatNumber(sortedDistricts[district].confirmed)}
+                    </span>
                   </td>
                 </tr>
               );
@@ -276,7 +294,9 @@ function Row(props) {
                 ? `${sortedDistricts['Unknown'].delta.confirmed}`
                 : ''}
             </span>
-            {sortedDistricts['Unknown'].confirmed}
+            <span className="table__count-text">
+              {formatNumber(sortedDistricts['Unknown'].confirmed)}
+            </span>
           </td>
         </tr>
       )}
